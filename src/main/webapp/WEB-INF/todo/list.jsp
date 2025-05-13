@@ -2,10 +2,11 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-    <title>Todo List Test</title>
+    <title>Todo List</title>
 </head>
 <body>
 <h1>Todo List</h1>
+<h2>${appName}</h2>
 <h2>${loginInfo}</h2>
 <h3>${loginInfo.mname}</h3>
 
