@@ -20,6 +20,31 @@ public class LoginController extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
     {
         log.info("login get ...............");
+
+        Cookie[] cookies = req.getCookies();
+        if(cookies!=null)
+        {
+            for(Cookie cookie:cookies)
+            {
+                if("rememberMe".equals(cookie.getName()))
+                {
+                    String uuid=cookie.getValue();
+                    try
+                    {
+                        MemberDTO dto=MemberService.INSTANCE.getByUuid(uuid);
+                        if(dto!=null)
+                        {
+                            req.setAttribute("rememberMe", dto);
+                        }
+                    }
+                    catch(Exception e)
+                    {
+                        log.warning("자동 로그인 정보 조회 실패!!" + e.getMessage());
+                    }
+                }
+            }
+        }
+
         req.getRequestDispatcher("/WEB-INF/login.jsp").forward(req, resp);
     }
 
@@ -32,18 +57,18 @@ public class LoginController extends HttpServlet {
         String mpw=req.getParameter("mpw");
         String auto=req.getParameter("auto");
 
-        boolean rememberMe = auto!=null&&auto.equals("on");
+        boolean isRememberd = auto!=null&&auto.equals("on");
         try
         {
             MemberDTO dto= MemberService.INSTANCE.login(mid, mpw);
 
-            if(rememberMe)
+            if(isRememberd)
             {
                 String uuid= UUID.randomUUID().toString();
                 MemberService.INSTANCE.updateUuid(mid, uuid);
                 dto.setUuid(uuid);
 
-                Cookie rememberCookie=new Cookie("remember-me",uuid);
+                Cookie rememberCookie=new Cookie("rememberMe",uuid);
                 rememberCookie.setMaxAge(lifeTime);
                 rememberCookie.setPath("/");
 
@@ -52,7 +77,7 @@ public class LoginController extends HttpServlet {
             else
             {
                 //자동 로그인 체크 안하면 쿠키 삭제
-                Cookie deleteCookie = new Cookie("remember-me", "");
+                Cookie deleteCookie = new Cookie("rememberMe", "");
                 deleteCookie.setPath("/");
                 deleteCookie.setMaxAge(0);
                 resp.addCookie(deleteCookie);
