@@ -31,7 +31,8 @@ public class LoginCheckFilter implements Filter
         HttpSession session = request.getSession();
 
         // 1. 세션에 로그인 정보가 있으면 바로 통과
-        if (session.getAttribute("loginInfo") != null) {
+        if (session.getAttribute("loginInfo") != null)
+        {
             chain.doFilter(req, resp);
             return;
         }
@@ -39,11 +40,13 @@ public class LoginCheckFilter implements Filter
         // 2. 쿠키로 자동 로그인 시도
         Cookie cookie = findCookie(request.getCookies(), "remember-me");
 
-        if (cookie != null) {
+        if (cookie != null)
+        {
             String uuid = cookie.getValue();
             log.info("자동 로그인용 쿠키 발견: " + uuid);
 
-            try {
+            try
+            {
                 MemberDTO dto = MemberService.INSTANCE.getByUuid(uuid);
                 log.info("쿠키의 값으로 조회한 사용자 정보: " + dto);
 
@@ -52,8 +55,10 @@ public class LoginCheckFilter implements Filter
                     chain.doFilter(req, resp); // 통과
                     return;
                 }
-            } catch (Exception e) {
-                e.printStackTrace(); // 로그로 남겨도 좋음
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
             }
         }
 

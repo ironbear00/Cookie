@@ -49,6 +49,14 @@ public class LoginController extends HttpServlet {
 
                 resp.addCookie(rememberCookie);
             }
+            else
+            {
+                //자동 로그인 체크 안하면 쿠키 삭제
+                Cookie deleteCookie = new Cookie("remember-me", "");
+                deleteCookie.setPath("/");
+                deleteCookie.setMaxAge(0);
+                resp.addCookie(deleteCookie);
+            }
 
             HttpSession session=req.getSession();
             session.setAttribute("loginInfo",dto);
